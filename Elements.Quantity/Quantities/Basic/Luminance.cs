@@ -63,5 +63,7 @@ namespace Elements.Quantity
         public static Luminance operator -(Luminance a) { return a.Multiply(-1); }
 
         #endregion
+
+        public override string ToString() => this.FormatAuto();
     }
 }
