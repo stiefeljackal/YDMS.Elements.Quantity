@@ -63,5 +63,7 @@ namespace Elements.Quantity
         public static Torque operator -(Torque a) { return a.Multiply(-1); }
 
         #endregion
+
+        public override string ToString() => this.FormatAuto();
     }
 }
