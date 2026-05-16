@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Globalization;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace Elements.Quantity
 {
@@ -57,12 +58,7 @@ namespace Elements.Quantity
         public static string FormatAuto<T>(this T q, string? formatNum = null,
             bool longName = false, List<UnitGroup>? groups = null, Unit<T>? defaultUnit = null) where T : unmanaged, IQuantity<T>
         {
-            Unit<T>? selectedUnit = null;
-
-            if (q.BaseValue == 0)
-                selectedUnit = defaultUnit ?? q.DefaultUnit;
-            else
-                selectedUnit = SelectBestUnit(q, groups ?? UnitGroup.DefaultUnitGroups);
+            var selectedUnit = SelectBestUnit(q, groups, defaultUnit);
 
             return FormatAs(q, selectedUnit, formatNum, longName);
         }
@@ -161,6 +157,12 @@ namespace Elements.Quantity
         {
             return unitCache[typeof(T)];
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Unit<T> SelectBestUnit<T>(this T q, List<UnitGroup>? groups = null, Unit<T>? defaultUnit = null) where T : unmanaged, IQuantity<T> =>
+            q.BaseValue == 0
+                ? defaultUnit ?? q.DefaultUnit
+                : SelectBestUnit(q, groups ?? UnitGroup.DefaultUnitGroups);
 
         public static Unit<T> SelectBestUnit<T>(this T q, List<UnitGroup> groups)
             where T : unmanaged, IQuantity<T>
