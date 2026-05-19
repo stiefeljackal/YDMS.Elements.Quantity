@@ -17,6 +17,44 @@ namespace Elements.Quantity
         public static CultureInfo Culture = System.Globalization.CultureInfo.InvariantCulture;
         public static NumberTryParseHandler<double>? CustomParser;
 
+        private const byte NUM_OF_DECIMALS_TO_ROUND_UP_TO = 10;
+        private const byte MAX_NUM_OF_DECIMALS = 30;
+        private const byte DECMIAL_PLACEMENT_INCREMENT = 4;
+
+        /// <summary>
+        /// Adjusts the precision of the specified quantity value by rounding it to an appropriate number of decimal
+        /// places based on its magnitude.
+        /// </summary>
+        /// <remarks>
+        /// This method is useful for normalizing numeric values where excessive decimal places
+        /// may be unnecessary for large numbers while significant digits should be preserved for small values. The exact
+        /// number of decimal places used depends on the magnitude of the input. Values that are either greater than or
+        /// equal to 1 or less than or equal to -1 are rounded to a fixed number of decimal places. Smaller values are
+        /// rounded to preserve significant digits.
+        /// </remarks>
+        /// <param name="quantityValue">The quantity value to be rounded.</param>
+        /// <returns>A double representing the input value rounded to a suitable precision. The result maintains significant
+        /// digits for small values and uses a fixed precision for larger values.</returns>
+        public static double AdjustPrecision(double quantityValue)
+        {
+            if (quantityValue >= 1 || quantityValue <= -1)
+            {
+                return Math.Round(quantityValue, NUM_OF_DECIMALS_TO_ROUND_UP_TO);
+            }
+
+            var currentDecimalPlace = 0;
+            var nextNonZeroDecimalPlace = 0;
+            var decimalPlacesDelta = 0d;
+            do
+            {
+                currentDecimalPlace = Math.Min(currentDecimalPlace + DECMIAL_PLACEMENT_INCREMENT, MAX_NUM_OF_DECIMALS);
+                decimalPlacesDelta = Math.Pow(10, currentDecimalPlace);
+                nextNonZeroDecimalPlace = Math.Abs((int)Math.Round(quantityValue * decimalPlacesDelta));
+            } while (nextNonZeroDecimalPlace <= 0 && currentDecimalPlace < MAX_NUM_OF_DECIMALS);
+
+            return Math.Round(quantityValue * decimalPlacesDelta, NUM_OF_DECIMALS_TO_ROUND_UP_TO) / decimalPlacesDelta;
+        }
+
         public static bool TryParse(string str, NumberStyles numberStyles, IFormatProvider formatProvider, out double value)
         {
             if (CustomParser != null)

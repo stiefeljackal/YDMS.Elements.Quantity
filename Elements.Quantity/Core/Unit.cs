@@ -275,7 +275,8 @@ namespace Elements.Quantity
         public string FormatAs(T q, string? formatNum = null, bool useLongName = false,
             string? overrideName = null)
         {
-            var quantityValue = ConvertTo(q);
+            var quantityValue = QuantityHelper.AdjustPrecision(ConvertTo(q));
+
             var numberText = quantityValue.Format(formatNum);
 
             var unitName = overrideName != null ? overrideName : GetDefaultUnitNameByValue(quantityValue, useLongName);
