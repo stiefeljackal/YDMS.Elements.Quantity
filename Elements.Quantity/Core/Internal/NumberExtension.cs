@@ -8,11 +8,11 @@ namespace Elements.Quantity.Core.Internal
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsSingular(this double number) => Math.Abs(number - 1) < 1e-8;
 
-        public static string Format(this double number, string? format)
+        public static string Format(this double number, string? format, IFormatProvider? provider = null)
         {
             try
             {
-                return number.ToString(format);
+                return number.ToString(format, provider);
             }
             catch (FormatException)
             {
